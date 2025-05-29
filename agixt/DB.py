@@ -54,6 +54,10 @@ try:
     connection = engine.connect()
     Base = declarative_base()
 
+    def get_session():  # <== PLAATS HEM HIER
+        Session = sessionmaker(bind=engine, autoflush=False)
+        return Session()
+
 except Exception as e:
     logging.error(f"Error connecting to database: {e}")
     Base = None
