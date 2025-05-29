@@ -43,7 +43,7 @@ try:
             LOGIN_URI = f"{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}?sslmode={DATABASE_SSL}"
         DATABASE_URI = f"postgresql://{LOGIN_URI}"
     else:
-        DATABASE_URI = f"sqlite:///{DATABASE_NAME}.db"
+DATABASE_URI = "postgresql://postgres:jBbUXIaHzgQcWDYIqgktsmlrGvmxMhnN@metro.proxy.rlwy.net:18198/railway"
     engine = create_engine(DATABASE_URI, pool_size=40, max_overflow=-1)
     connection = engine.connect()
     Base = declarative_base()
