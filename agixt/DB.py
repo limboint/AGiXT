@@ -29,29 +29,10 @@ logging.basicConfig(
 )
 DEFAULT_USER = getenv("DEFAULT_USER")
 try:
-    DATABASE_TYPE = getenv("DATABASE_TYPE")
-    DATABASE_NAME = getenv("DATABASE_NAME")
-
-    if DATABASE_TYPE != "sqlite":
-        DATABASE_USER = getenv("DATABASE_USER")
-        DATABASE_PASSWORD = getenv("DATABASE_PASSWORD")
-        DATABASE_HOST = getenv("DATABASE_HOST")
-        DATABASE_PORT = getenv("DATABASE_PORT")
-        DATABASE_SSL = getenv("DATABASE_SSL", "disable")
-
-        if DATABASE_SSL == "disable":
-            LOGIN_URI = f"{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
-        else:
-            LOGIN_URI = f"{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}?sslmode={DATABASE_SSL}"
-
-        DATABASE_URI = f"postgresql://{LOGIN_URI}"
-    else:
-        DATABASE_URI = "postgresql://postgres:jBbUXIaHzgQcWDYIqgktsmlrGvmxMhnN@metro.proxy.rlwy.net:18198/railway"
-
+    DATABASE_URI = getenv("DATABASE_URI")
     engine = create_engine(DATABASE_URI, pool_size=40, max_overflow=-1)
     connection = engine.connect()
     Base = declarative_base()
-
 except Exception as e:
     logging.error(f"Error connecting to database: {e}")
     Base = None
