@@ -24,29 +24,40 @@ from Globals import getenv
 import numpy as np
 
 logging.basicConfig(
-    level=getenv("LOG_LEVEL"),
-    format=getenv("LOG_FORMAT"),
+    level=getenv("LOG_LEVEL", "INFO"),
+    format=getenv("LOG_FORMAT", "%(asctime)s | %(levelname)s | %(message)s"),
 )
+
 DEFAULT_USER = getenv("DEFAULT_USER")
+
 try:
-    DATABASE_URI = getenv("DATABASE_URI")
+    DATABASE_TYPE = getenv("DATABASE_TYPE", "postgresql")
+    DATABASE_NAME = getenv("DATABASE_NAME", "railway")
+
+    if DATABASE_TYPE == "sqlite":
+        DATABASE_URI = f"sqlite:///{DATABASE_NAME}"
+    else:
+        DATABASE_USER = getenv("DATABASE_USER", "postgres")
+        DATABASE_PASSWORD = getenv("DATABASE_PASSWORD", "")
+        DATABASE_HOST = getenv("DATABASE_HOST", "localhost")
+        DATABASE_PORT = getenv("DATABASE_PORT", "5432")
+        DATABASE_SSL = getenv("DATABASE_SSL", "disable")
+
+        if DATABASE_SSL == "disable":
+            LOGIN_URI = f"{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
+        else:
+            LOGIN_URI = f"{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}?sslmode={DATABASE_SSL}"
+        DATABASE_URI = f"postgresql://{LOGIN_URI}"
+
+    logging.info(f"Connecting to database: {DATABASE_URI}")
     engine = create_engine(DATABASE_URI, pool_size=40, max_overflow=-1)
     connection = engine.connect()
     Base = declarative_base()
+
 except Exception as e:
     logging.error(f"Error connecting to database: {e}")
     Base = None
     engine = None
-
-def get_session():
-    Session = sessionmaker(bind=engine, autoflush=False)
-    session = Session()
-    return session
-
-
-def get_new_id():
-    return str(uuid.uuid4())
-
 
 class UserRole(Base):
     __tablename__ = "Role"
